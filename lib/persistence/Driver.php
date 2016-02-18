@@ -1,0 +1,40 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: vbolshov
+ * Date: 1-2-16
+ * Time: 10:48
+ */
+
+namespace tinyorm\persistence;
+
+use tinyorm\Entity;
+
+interface Driver
+{
+    /**
+     * @param int $id
+     * @return Entity
+     */
+    function find($id, Entity $proto);
+    /**
+     * @param Entity $entity
+     * @return Entity
+     */
+    function save(Entity $entity);
+    /**
+     * @param Entity $entity
+     * @return bool
+     */
+    function update(Entity $entity);
+    /**
+     * @param Entity $entity
+     * @return int the inserted entity ID.
+     */
+    function insert(Entity $entity);
+    /**
+     * @param Entity $entity
+     * @return bool
+     */
+    function delete(Entity $entity);
+}
