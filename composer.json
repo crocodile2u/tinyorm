@@ -5,5 +5,13 @@
     "ext-pdo": "*"
   },
   "version": "1.0.0",
-  "license": "MIT"
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "tinyorm\\": "lib/"
+    }
+  },
+  "branch-alias": {
+    "dev-master": "1.0.x-dev"
+  }
 }
