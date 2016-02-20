@@ -65,7 +65,7 @@ class DbDriverTest extends BaseTestCase {
         $entity = $persistenceDriver->find($id, new TestEntity());
         $result = $persistenceDriver->delete($entity);
         $this->assertTrue($result);
-        $this->assertFalse($persistenceDriver->find($id, new TestEntity()))
+        $this->assertFalse($persistenceDriver->find($id, new TestEntity()));
     }
 
     protected function insert($varchar, $int, $unique) {
