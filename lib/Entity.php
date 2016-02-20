@@ -121,6 +121,17 @@ abstract class Entity
      */
     abstract function getDefaults();
 
+    /**
+     * @param array $data
+     */
+    function importArray(array $data)
+    {
+        $this->data = array_intersect_key(array_merge($this->data, $data), $this->data);
+    }
+
+    /**
+     * @return array
+     */
     function toArray()
     {
         return array_intersect_key($this->data, $this->getDefaults());

@@ -54,7 +54,8 @@ class DbDriver implements Driver
         $sql = "SELECT * FROM {$proto->getSourceName()} WHERE {$proto->getPKName()} = ?";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$id]);
-        return $stmt->fetch(\PDO::FETCH_OBJ, $proto);
+        $stmt->setFetchMode(\PDO::FETCH_INTO, $proto);
+        return $stmt->fetch();
     }
 
     /**
@@ -123,7 +124,7 @@ class DbDriver implements Driver
             }
             $sqlValues[] = ":$col";
         }
-        $sql = "INSERT INTO {$entity->getSourceName()} () " . join(", ", $keys) .
+        $sql = "INSERT INTO {$entity->getSourceName()} (" . join(", ", $keys) . ") " .
             " VALUES (" . join(", ", $sqlValues) . ")";
         $stmt = $this->db->prepare($sql);
         $result = $stmt->execute($data);
