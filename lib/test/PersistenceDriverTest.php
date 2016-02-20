@@ -3,7 +3,14 @@
 namespace tinyorm\test;
 
 abstract class PersistenceDriverTest extends BaseTestCase {
+
+    protected function isTestSkipped()
+    {
+        return false;
+    }
+
     function testFind() {
+        $this->skipTestIfNeeded();
         $id = $this->insert("v1", 1, "u1");
         /** @var TestEntity $entity */
         $entity = $this->createPersistenceDriver()->find($id, new TestEntity());
@@ -15,6 +22,7 @@ abstract class PersistenceDriverTest extends BaseTestCase {
 
     function testInsert()
     {
+        $this->skipTestIfNeeded();
         $entity = new TestEntity([
             "c_varchar" => "v1",
             "c_int" => 1,
@@ -27,6 +35,7 @@ abstract class PersistenceDriverTest extends BaseTestCase {
 
     function testUpdate()
     {
+        $this->skipTestIfNeeded();
         $id = $this->insert("v1", 1, "u1");
         $persistenceDriver = $this->createPersistenceDriver();
         $entity = $persistenceDriver->find($id, new TestEntity());
@@ -38,6 +47,7 @@ abstract class PersistenceDriverTest extends BaseTestCase {
 
     function testSave()
     {
+        $this->skipTestIfNeeded();
         $entity = new TestEntity([
             "c_varchar" => "v1",
             "c_int" => 1,
@@ -56,6 +66,7 @@ abstract class PersistenceDriverTest extends BaseTestCase {
 
     function testDelete()
     {
+        $this->skipTestIfNeeded();
         $id = $this->insert("v1", 1, "u1");
         $persistenceDriver = $this->createPersistenceDriver();
         $entity = $persistenceDriver->find($id, new TestEntity());
@@ -74,4 +85,11 @@ abstract class PersistenceDriverTest extends BaseTestCase {
      * @return \tinyorm\persistence\Driver
      */
     abstract protected function createPersistenceDriver();
+
+    protected function skipTestIfNeeded()
+    {
+        if ($this->isTestSkipped()) {
+            $this->markTestSkipped("ZHandlersocket extension not found. Checkout https://github.com/crocodile2u/zhandlersocket");
+        }
+    }
 }

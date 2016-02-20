@@ -10,6 +10,11 @@ class ZHandlersocketDriverTest extends PersistenceDriverTest {
 
     private $zClient;
 
+    protected function isTestSkipped()
+    {
+        return !class_exists(\ZHandlersocket\Client::class);
+    }
+
     protected function setUp()
     {
         parent::setUp();
