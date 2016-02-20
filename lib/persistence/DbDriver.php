@@ -55,7 +55,7 @@ class DbDriver implements Driver
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$id]);
         $stmt->setFetchMode(\PDO::FETCH_INTO, $proto);
-        return $stmt->fetch();
+        return $stmt->fetch() ?: null;
     }
 
     /**
