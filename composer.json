@@ -4,5 +4,6 @@
     "php": ">=5.4.0",
     "ext-pdo": "*"
   },
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "license": "MIT"
 }
