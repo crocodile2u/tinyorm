@@ -10,6 +10,7 @@
 namespace tinyorm\test;
 
 class TestEntity extends \tinyorm\Entity {
+    protected $dbName = 'test';
     protected $sourceName = 'test';
     protected $pkName = 'id';
     protected $autoUpdatedCols = array ();

@@ -69,6 +69,14 @@ abstract class Entity
     }
 
     /**
+     * @return string[]
+     */
+    function getColumns()
+    {
+        return array_keys($this->getDefaults());
+    }
+
+    /**
      * @return string
      */
     function getSourceName()
@@ -123,10 +131,12 @@ abstract class Entity
 
     /**
      * @param array $data
+     * @return $this
      */
     function importArray(array $data)
     {
         $this->data = array_intersect_key(array_merge($this->data, $data), $this->data);
+        return $this;
     }
 
     /**
