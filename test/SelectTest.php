@@ -169,6 +169,21 @@ class SelectTest extends BaseTestCase
         $this->assertEquals($addOn, $rows[0]["add_on"]);
     }
 
+    function testQueryId()
+    {
+        $select = $this->createSelect("test")->setId("TEST_ID");
+        $str = $select->__toString();
+        $this->assertTrue(substr_count($str, "TEST_ID") == 1);
+        $stmt = $select->execute();
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $this->assertEquals(self::ROWCOUNT, count($rows));
+
+        $stmt = $select->getCountStatement();
+        $sql = $stmt->queryString;
+        $this->assertTrue(substr_count($sql, "TEST_ID") == 1);
+        $this->assertEquals(self::ROWCOUNT, $stmt->fetchColumn());
+    }
+
     /**
      * @param $table
      * @return Select

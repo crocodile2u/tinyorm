@@ -21,17 +21,17 @@ interface Driver
      * @param Entity $entity
      * @return Entity
      */
-    function save(Entity $entity);
+    function save(Entity $entity, &$affectedRowCount = null);
     /**
      * @param Entity $entity
      * @return bool
      */
-    function update(Entity $entity);
+    function update(Entity $entity, &$affectedRowCount = null);
     /**
      * @param Entity $entity
      * @return int the inserted entity ID.
      */
-    function insert(Entity $entity);
+    function insert(Entity $entity, &$affectedRowCount = null);
     /**
      * @param Entity $entity
      * @return bool

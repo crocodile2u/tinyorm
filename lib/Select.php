@@ -46,10 +46,12 @@ class Select
     private $orderBy = [];
     private $limit = 0;
     private $offset = 0;
+    private $id;
     /**
      * @var DbInterface
      */
     private $db;
+    private $fetchMode;
     /**
      * Select constructor.
      * @param string $from
@@ -60,6 +62,48 @@ class Select
         $this->from = $from;
         $this->cols = $cols;
         $this->colsBind = array_slice(func_get_args(), 2);
+    }
+
+    /**
+     * The resulting SQL query will contain this id in a comment.
+     * This way it can be easily found in logs.
+     * @param $id
+     */
+    function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @see http://php.net/manual/en/pdostatement.setfetchmode.php
+     * @param int $mode
+     * @param mixed $arg1
+     * @param mixed $arg2
+     * @return $this
+     */
+    function setFetchMode($mode, $arg1 = null, $arg2 = null)
+    {
+        $this->fetchMode = [$mode, $arg1, $arg2];
+    }
+
+    /**
+     * @param Entity|object $prototype
+     * @return $this
+     */
+    function setFetchInto($prototype)
+    {
+        return $this->setFetchMode(\PDO::FETCH_INTO, $prototype);
+    }
+
+    /**
+     * @param Entity|object|string $class
+     * @return $this
+     */
+    function setFetchClass($class, $ctorArgs = [])
+    {
+        $class = is_object($class) ? get_class($class) : (string) $class;
+        return $this->setFetchMode(\PDO::FETCH_CLASS, $class, $ctorArgs);
     }
 
     /**
@@ -77,18 +121,44 @@ class Select
      */
     function execute()
     {
-        list($sql, $bind) = $this->compose($this->cols, $this->groupBy, $this->having, $this->limit, $this->colsBind);
+        list($sql, $bind) = $this->compose(
+            $this->cols,
+            $this->groupBy,
+            $this->having,
+            $this->limit,
+            $this->colsBind,
+            $this->id
+        );
         $stmt = $this->db->prepare($sql);
+        if ($this->fetchMode) {
+            $stmt->setFetchMode($this->fetchMode[0], $this->fetchMode[1], $this->fetchMode[2]);
+        }
         $stmt->execute($bind);
         return $stmt;
     }
 
     function count($expr = "*")
     {
-        list($sql, $bind) = $this->compose("COUNT($expr)", false, false, 0, null);
+        return $this->getCountStatement($expr)->fetchColumn();
+    }
+
+    /**
+     * @param string $expr
+     * @return \PDOStatement
+     */
+    function getCountStatement($expr = "*")
+    {
+        list($sql, $bind) = $this->compose(
+            "COUNT($expr)",
+            false,
+            false,
+            0,
+            null,
+            $this->id ? ($this->id . ".count") : null
+        );
         $stmt = $this->db->prepare($sql);
         $stmt->execute($bind);
-        return $stmt->fetchColumn();
+        return $stmt;
     }
 
     /**
@@ -98,7 +168,14 @@ class Select
      */
     function __toString()
     {
-        list($sql, $bind) = $this->compose($this->cols, $this->groupBy, $this->having, $this->limit, $this->colsBind);
+        list($sql, $bind) = $this->compose(
+            $this->cols,
+            $this->groupBy,
+            $this->having,
+            $this->limit,
+            $this->colsBind,
+            $this->id
+        );
         $parts = explode("?", $sql);
         $ret = "";
         foreach ($parts as $i => $sqlPart) {
@@ -195,14 +272,15 @@ class Select
         return $this->limit($pageSize)->offset(($pageNumber - 1) * $pageSize);
     }
 
-    private function compose($cols, $groupBy, $having, $limit, $colsBind)
+    private function compose($cols, $groupBy, $having, $limit, $colsBind, $id)
     {
+        $idStr = $id ? "/* $id */" : "";
         if ($this->colsBind) {
             $toInflate = [$this->cols => $colsBind];
             list($colsSql, $bind) = $this->inflate($toInflate, [], " ");
-            $sql = "SELECT {$colsSql} FROM {$this->from}";
+            $sql = "SELECT $idStr {$colsSql} FROM {$this->from}";
         } else {
-            $sql = "SELECT {$cols} FROM {$this->from}";
+            $sql = "SELECT $idStr {$cols} FROM {$this->from}";
             $bind = [];
         }
 

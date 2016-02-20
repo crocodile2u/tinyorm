@@ -57,20 +57,26 @@ class DbDriver implements Driver
         return $stmt->fetch(\PDO::FETCH_OBJ, $proto);
     }
 
-    function save(Entity $entity)
+    /**
+     * @param Entity $entity
+     * @param int &$affectedRowCount
+     * @return bool|int|string|Entity
+     */
+    function save(Entity $entity, &$affectedRowCount = null)
     {
         if ($entity->getPK()) {
-            return $this->update($entity);
+            return $this->update($entity, $affectedRowCount);
         } else {
-            return $this->insert($entity);
+            return $this->insert($entity, $affectedRowCount);
         }
     }
 
     /**
      * @param Entity $entity
+     * @param int &$affectedRowCount
      * @return Entity|bool
      */
-    function update(Entity $entity)
+    function update(Entity $entity, &$affectedRowCount = null)
     {
         if (!$entity->getPK()) {
             throw new \LogicException("Cannot update entity: PK is empty");
@@ -92,10 +98,16 @@ class DbDriver implements Driver
         if (!$result) {
             throw new \RuntimeException("UDPATE entity: DB query failed (PK: {$entity->getPK()})");
         }
-        return (bool) $stmt->rowCount();
+        $affectedRowCount = $stmt->rowCount();
+        return $entity;
     }
 
-    function insert(Entity $entity)
+    /**
+     * @param Entity $entity
+     * @param int &$affectedRowCount
+     * @return Entity
+     */
+    function insert(Entity $entity, &$affectedRowCount = null)
     {
         if ($entity->getPK()) {
             throw new \LogicException("Cannot insert entity: PK is not empty");
@@ -118,17 +130,22 @@ class DbDriver implements Driver
         if (!$result) {
             throw new \RuntimeException("INSERT entity: DB query failed");
         }
-        if ($stmt->rowCount()) {
-            $id = $this->db->lastInsertId();
+        $affectedRowCount = $stmt->rowCount();
+        if ($affectedRowCount) {
+            $id = (int) $this->db->lastInsertId($entity->getSequenceName());
             if ($id) {
                 $entity->setPK($id);
-                return $id;
+                return $entity;
             } else {
                 throw new \LogicException("INSERT: cannot get lastInsertId");
             }
         }
     }
 
+    /**
+     * @param Entity $entity
+     * @return bool
+     */
     function delete(Entity $entity)
     {
         if (!$entity->getPK()) {

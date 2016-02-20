@@ -47,6 +47,10 @@ abstract class Entity
     /**
      * @var string
      */
+    protected $sequenceName;
+    /**
+     * @var string
+     */
     protected $pkName = "id";
     /**
      * These fields will not be inserted/updated, the DB backend is responsible for them.
@@ -70,6 +74,14 @@ abstract class Entity
     function getSourceName()
     {
         return $this->sourceName;
+    }
+
+    /**
+     * @return string
+     */
+    function getSequenceName()
+    {
+        return $this->sequenceName;
     }
 
     /**
@@ -108,14 +120,6 @@ abstract class Entity
      * @return array
      */
     abstract function getDefaults();
-
-    /**
-     * @return Mapper
-     */
-    function getMapper()
-    {
-        return new Mapper($this);
-    }
 
     function toArray()
     {

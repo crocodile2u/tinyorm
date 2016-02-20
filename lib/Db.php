@@ -315,7 +315,7 @@ class Db implements DbInterface
     /**
      * @return \PDO
      */
-    protected function getPdo()
+    public function getPdo()
     {
         if (null === $this->pdo) {
             $timer = $this->debugLog("Establish PDO connection");
