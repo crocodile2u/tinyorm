@@ -21,8 +21,6 @@ class ZHandlersocketDriverTest extends PersistenceDriverTest {
         $this->zClient = new \ZHandlersocket\Client();
     }
 
-
-
     /**
      * @return DbDriver
      */

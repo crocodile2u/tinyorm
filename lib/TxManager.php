@@ -1,5 +1,10 @@
 <?php
 /**
+ * TxManager (Transaction Manager. Handles transactions which are run by database connections).
+ * Takes care of nested transactions. Upon COMMIT, all the participating transactions are commited
+ * (well, in case there's no nesting, otherwise the nesting level is decremented).
+ * In case of ROLLBACK, all participating transactions are rolled back, for all registered connections.
+ *
  * Created by PhpStorm.
  * User: vbolshov
  * Date: 29-12-15
