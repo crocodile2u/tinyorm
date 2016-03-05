@@ -33,6 +33,7 @@
 
 namespace tinyorm\test;
 
+use tinyorm\Bind;
 use tinyorm\Select;
 
 class SelectTest extends BaseTestCase
@@ -72,6 +73,14 @@ class SelectTest extends BaseTestCase
     function testWhereCondition()
     {
         $select = $this->createSelect("test")->where("c_int = ?", 0);
+        $this->assertEquals(self::ZEROS, $select->count());
+        $rows = $select->execute()->fetchAll(\PDO::FETCH_ASSOC);
+        $this->assertEquals(self::ZEROS, count($rows));
+    }
+
+    function testWhereConditionWithBind()
+    {
+        $select = $this->createSelect("test")->where("c_int = ?", Bind::int(0));
         $this->assertEquals(self::ZEROS, $select->count());
         $rows = $select->execute()->fetchAll(\PDO::FETCH_ASSOC);
         $this->assertEquals(self::ZEROS, count($rows));

@@ -109,7 +109,8 @@ class Select
         if ($this->fetchMode) {
             $stmt->setFetchMode($this->fetchMode[0], $this->fetchMode[1], $this->fetchMode[2]);
         }
-        $stmt->execute($bind);
+        $this->bindValues($stmt, $bind);
+        $stmt->execute();
         return $stmt;
     }
 
@@ -133,7 +134,8 @@ class Select
             $this->id ? ($this->id . ".count") : null
         );
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($bind);
+        $this->bindValues($stmt, $bind);
+        $stmt->execute();
         return $stmt;
     }
 
@@ -325,5 +327,16 @@ class Select
         }
 
         return [$inflatedSql, $inflatedBind];
+    }
+
+    private function bindValues(\PDOStatement $stmt, $bind)
+    {
+        foreach ($bind as $i => $boundValue) {
+            if ($boundValue instanceof Bind) {
+                $stmt->bindValue($i + 1, $boundValue->getValue(), $boundValue->getType());
+            } else {
+                $stmt->bindValue($i + 1, $boundValue);
+            }
+        }
     }
 }
