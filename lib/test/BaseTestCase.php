@@ -3,6 +3,7 @@
 namespace tinyorm\test;
 
 use tinyorm\Db;
+use tinyorm\log\FileLog;
 
 class BaseTestCase extends \PHPUnit_Framework_TestCase {
     /**
@@ -14,6 +15,8 @@ class BaseTestCase extends \PHPUnit_Framework_TestCase {
     {
         parent::setUp();
         $this->connection = get_test_connection();
+        $this->connection->setName("Conn 1");
+//        $this->connection->setDebugLog(new FileLog());
         $this->connection->exec("DELETE FROM test");
         $this->connection->exec("DELETE FROM test2");
         $this->connection->resetQueryCount();

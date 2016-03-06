@@ -18,6 +18,40 @@ While there are tools that conform to some of the requirements, I failed to find
 
 # Show me the code!
 
+Select usage:
+```php
+$select = (new Select("my_table"))
+    ->join("LEFT JOIN another_table USING (join_column)")
+    ->where("filter_column = ?", $filterColumnValue)
+    ->setConnection($db);
+$count = $select->count("DISTINCT id");
+$rows = $select->execute()->fetchAll(\PDO::FETCH_ASSOC);
+```
+
+You can set fetch modes for Select:
+```php
+$select->setFetchMode(\PDO::FETCH_ASSOC);
+$select->setFetchClass(MyTableEntity::class);
+$select->setFetchInto(new MyTableEntity());
+```
+
+Working with multiple DB connections:
+
+```php
+$txManager = new \tinyorm\TxManager();
+$txManager->registerConnection($this->connection)
+    ->registerConnection($this->connection2);
+
+$result = $txManager->atomic(function () {
+    $this->connection->exec("INSERT INTO test (c_unique) VALUES ('val1')");
+    $this->connection2->exec("INSERT INTO test (c_unique) VALUES ('val2')");
+    return true;
+});
+```
+
+This way, if anything goes wrong with the first or the second INSERT, transactions in both connection will be rolled back, no rows will be inserted. On the other hand, if everything goes fine, transactions in both connection will be commited.
+
+Transaction manager supports nested transactions, and the tinyorm\Db class also supports them.
 
 # The approach
 I used an approach similar to that of Zend Framework 2 ( http://framework.zend.com/manual/current/en/user-guide/database-and-models.html ). The entity classes are just simple data containers that do not have DB connection/persistence logic. However, in the end, tinyorm entities do have minimal "knowledge" about their relationship to a storage layer. First, they have _getSourceName()_ method which essentially is meant to return a storage table/collection name. Second, there are _getPK()_ and _setPK()_ methods to access primary key. The name primary key column is stored in protected _pkName_ property. And finally, entities have _getSequenceName()_. I made all this for the sake of simplicity, in order not to have to introduce more classes. tinyorm only supports _AUTO_INCREMENT_'ed primary keys.

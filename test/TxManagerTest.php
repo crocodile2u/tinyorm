@@ -46,6 +46,7 @@ class TxManagerTest extends BaseTestCase
     {
         parent::setUp();
         $this->connection2 = clone $this->connection;
+        $this->connection2->setName("Conn 2");
     }
 
     function testGroupCommit()
@@ -65,6 +66,58 @@ class TxManagerTest extends BaseTestCase
         $this->assertEquals(3, $this->connection->getQueryCount());
         $this->assertEquals(3, $this->connection2->getQueryCount());
         $this->assertRowCount("test", 2);
+    }
+
+    function testNestedTransactionsCommit()
+    {
+        $txm = new \tinyorm\TxManager();
+        $txm->registerConnection($this->connection)
+            ->registerConnection($this->connection2);
+
+        $result = $txm->atomic(function () use ($txm) {
+            $this->connection->exec("INSERT INTO test (c_unique) VALUES ('val1')");
+            $this->connection2->exec("INSERT INTO test (c_unique) VALUES ('val2')");
+            return $txm->atomic(function () {
+                $this->connection->exec("INSERT INTO test (c_unique) VALUES ('val3')");
+                $this->connection2->exec("INSERT INTO test (c_unique) VALUES ('val4')");
+                return true;
+            });
+        });
+
+        $this->assertEquals(true, $result);
+        // 4: BEGIN; INSERT; INSERT; COMMIT;
+        $this->assertEquals(4, $this->connection->getQueryCount());
+        $this->assertEquals(4, $this->connection2->getQueryCount());
+        $this->assertRowCount("test", 4);
+    }
+
+    function testNestedTransactionsRollback()
+    {
+        $txm = new \tinyorm\TxManager();
+        $txm->registerConnection($this->connection)
+            ->registerConnection($this->connection2);
+
+        try {
+            $txm->atomic(function () use ($txm) {
+                $this->connection->exec("INSERT INTO test (c_unique) VALUES ('val1')");
+                $this->connection2->exec("INSERT INTO test (c_unique) VALUES ('val2')");
+                return $txm->atomic(function () {
+                    $this->connection->exec("INSERT INTO test (c_unique) VALUES ('val3')");
+//                    $this->connection2->exec("INSERT INTO test (c_unique) VALUES ('val3')");
+                    throw new \Exception("TEST");
+                });
+            });
+            $this->fail("Exception expected");
+        } catch (\Exception $e) {
+            $this->assertEquals(\Exception::class, get_class($e));
+            $this->assertEquals("TEST", $e->getMessage());
+        }
+
+        // 4: BEGIN; INSERT; INSERT; ROLLBACK;
+        $this->assertEquals(4, $this->connection->getQueryCount());
+        // 3: BEGIN; INSERT; ROLLBACK;
+        $this->assertEquals(3, $this->connection2->getQueryCount());
+        $this->assertRowCount("test", 0);
     }
 
     function testGroupCommitOnlyAffectInstancesParticipatingInTransaction()
@@ -97,7 +150,6 @@ class TxManagerTest extends BaseTestCase
                 $this->connection->exec("INSERT INTO test (c_unique) VALUES ('val1')");
                 $this->connection2->exec("INSERT INTO test (c_unique) VALUES ('val2')");
                 throw new \Exception("TEST");
-                return true;
             });
             $this->fail("Expected exception throw");
         } catch (\Exception $e) {
