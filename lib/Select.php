@@ -12,6 +12,10 @@ namespace tinyorm;
 
 class Select
 {
+    /**
+     * @var DbInterface
+     */
+    static protected $defaultConnection;
     private $from;
     private $cols;
     private $colsBind;
@@ -82,6 +86,15 @@ class Select
         return $this->setFetchMode(\PDO::FETCH_CLASS, $class, $ctorArgs);
     }
 
+
+    /**
+     * @param DbInterface $db
+     */
+    static function setDefaultConnection(DbInterface $db)
+    {
+        self::$defaultConnection = $db;
+    }
+
     /**
      * @param DbInterface $db
      * @return $this
@@ -90,6 +103,14 @@ class Select
     {
         $this->db = $db;
         return $this;
+    }
+
+    /**
+     * @return DbInterface
+     */
+    function getConnection()
+    {
+        return $this->db ?: self::$defaultConnection;
     }
 
     /**
@@ -105,7 +126,7 @@ class Select
             $this->colsBind,
             $this->id
         );
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         if ($this->fetchMode) {
             $stmt->setFetchMode($this->fetchMode[0], $this->fetchMode[1], $this->fetchMode[2]);
         }
@@ -133,7 +154,7 @@ class Select
             null,
             $this->id ? ($this->id . ".count") : null
         );
-        $stmt = $this->db->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $this->bindValues($stmt, $bind);
         $stmt->execute();
         return $stmt;

@@ -1,0 +1,7 @@
+body {
+    margin-top: 60px;
+}
+.content {
+    height: calc(100vh - 160px);
+    overflow: auto;
+}

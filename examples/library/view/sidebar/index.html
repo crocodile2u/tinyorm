@@ -1,0 +1,23 @@
+<p>This is a small example of a web application that uses <a href="https://github.com/crocodile2u/tinyorm" target="_blank">tinyorm</a> to access database, create and manage entities etc. This application is library manager. Imagine you're running a real library: this app will help you keep track of the books and the related information.</p>
+<h3>To run this example, you will need:</h3>
+<ul>
+    <li><b>Tinyorm</b>. Install with <a href="https://getcomposer.org/" target="_blank">composer</a>: <pre>composer require crocodile2u/tinyorm:"dev-master".</pre></li>
+    <li>PHP v5.4+ with pdo_mysql.</li>
+    <li>MySQL.</li>
+</ul>
+<h3>Directory structure of the example:</h3>
+<dl>
+    <dt>etc/</dt>
+    <dd>Configuration. The fast way to make it work is to edit <i>config.base.php</i> but the better way is to create <i>config.override.php</i> where you can override selected keys from the configuration array.</dd>
+    <dt>lib/</dt>
+    <dd>Library application classes.</dd>
+    <dt>var/</dt>
+    <dd>Miscellaneous. SQL dump files etc.</dd>
+    <dt>view/</dt>
+    <dd>Views. PHP/HTML files included.</dd>
+    <dt>www/</dt>
+    <dd>Root folder of the appб accessible to the web.</dd>
+</dl>
+<h3>Let's go</h3>
+<p>First, I will add a tiny View class which is capable of rendering PHP template files in the <i>view</i> folder. It's only method is <i>static render($template, $vars)</i>. Even in a small app it is better to separate views, controllers and models. In this app controllers are php files like <i>index.php</i>, <i>book_add.php</i> etc. Some of them just render some views and output HTML, some handle POST requests and perform redirects when done. The Model part of MVC in our case is presented by <i>tinyorm</i>. In order to have easy access to DB connection and the tinyorm persistence driver, I will add a <i>Registry</i> class with static methods <i>db()</i> and <i>persistenceDriver()</i>. Because on every page we'll need certain basic functionality like class autoloading and configuration, I will create <i>bootstrap.php</i> which load configuration files etc. This file is included on every php page we'll create.</p>
+<p>A library is about books, true? Then we will start with creating our "<a href="books.php">Books</a>" page!</p>

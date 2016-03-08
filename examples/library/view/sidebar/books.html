@@ -1,0 +1,25 @@
+<p>First, let's create the database table for books. Login into MySQL console and type the following:</p>
+<pre>CREATE TABLE book (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255)
+) ENGINE INNODB;</pre>
+<p>Now we can autogenerate a so-called scaffolded class which will represent a Book entity. A book entity is an Object representation of a row in our <i>book</i> table in the DB. Open your terminal if you're on Linux/Mac, or run cmd.exe on Windows. Then cd to the library example root folder.</p>
+<pre>$ php ../../bin/generate.php --dbname=tinyorm_library --password=*** --table=book --class='library\scaffold\Book' --file=lib/scaffold/Book.php</pre>
+<p>Now take a look at the <i>lib/scaffold/Book.php</i>: there you will find a definition of class <i>library\scaffold\Book</i> which extends <i>tinyorm\Entity</i>. This file/class should be left untouched, so that in case we later add columns to the table or otherwise change its structure, we will be able to call <i>generate.php</i> again, and it will not overwrite code that we added to this class. Instead of modifying <i>library\scaffold\Book</i>, we'll create class <i>library\Book</i> which extends the scaffold one.</p>
+<p>First thing to add to our <i>books.php</i> page is the add-book functionality. So, we create the form that you see on the right, with <i>action=book_add.php</i> and a single text input <i>name=title</i>.</p>
+<p>Next, we have to write a few lines of PHP code to process the form submission (see <i>www/book_add.php</i>):</p>
+<pre>if ("POST" == $_SERVER["REQUEST_METHOD"]) {
+    $book = new Book();
+    $book->title = trim($_POST["title"]);
+    if ($book->title) {
+        Registry::persistenceDriver()->save($book);
+        header("Location: books.php");
+        exit;
+    } else {
+        echo "Empty title";
+    }
+}</pre>
+<p>This is not the most secure code, of course. Yet it is enough for the purpose of example.</p>
+<p>Of course, we need to display the book list:</p>
+<pre>$books = (new Select("book"))->orderBy("title")->execute();</pre>
+<p>This is equivalent of "<i>SELECT * FROM book ORDER BY title</i>".</p>
