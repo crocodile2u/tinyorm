@@ -21,5 +21,11 @@
 }</pre>
 <p>This is not the most secure code, of course. Yet it is enough for the purpose of example.</p>
 <p>Of course, we need to display the book list:</p>
-<pre>$books = (new Select("book"))->orderBy("title")->execute();</pre>
-<p>This is equivalent of "<i>SELECT * FROM book ORDER BY title</i>".</p>
+<pre>$books = (new Select("book"))
+    ->orderBy("title")
+    ->execute();</pre>
+<p>This is equivalent of "<i>SELECT * FROM book ORDER BY title</i>". Sometimes it is handy to fetch the result as Entity objects. For this, we could modify this line as follows:</p>
+<pre>$books = (new Select("book"))
+    ->setFetchClass(Book::class)
+    ->orderBy("title")->execute();</pre>
+<p>The second main entity of our library app is <i>Author</i>. It is very similar to the Book entity, take a look at the <a href="authors.php">authors.php</a> page</p>

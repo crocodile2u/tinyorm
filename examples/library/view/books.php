@@ -1,6 +1,5 @@
 <h3>Add new book</h3>
 <form method="post" action="book_add.php" class="form" id="add-form">
-    <input type="hidden" name="command" value="add">
     <label>Title:</label>
     <div class="input-group">
         <input type="text" name="title" class="form-control">
@@ -17,6 +16,7 @@
         <th>Actions</th>
     </tr>
     </thead>
+    <tbody>
     <?php foreach ($books as $book) : ?>
         <tr>
             <td><?=htmlspecialchars($book["title"], ENT_QUOTES)?></td>
@@ -26,4 +26,5 @@
             </td>
         </tr>
     <?php endforeach; ?>
+    </tbody>
 </table>

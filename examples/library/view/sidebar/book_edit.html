@@ -1,0 +1,15 @@
+<p>This page allows us to edit a book title. Also, we need to have user interface to link authors to their book. This interface is also here.</p>
+<p>The edit-book form contains just a text <i>input name=title</i>, and a hidden <i>input name=id</i>. This form submission is handled by <i>book_save.php</i>:</p>
+<pre>$id = (int) $_POST["id"];
+$book = Registry::persistenceDriver()->find($id, new Book());
+if (!$book) {
+    die("Book ID #" . (int) $_POST["id"] . " not found");
+}
+
+$book->title = trim($_POST["title"]);
+
+if (!$book->title) {
+    die("No book title provided");
+}
+
+Registry::persistenceDriver()->save($book);</pre>

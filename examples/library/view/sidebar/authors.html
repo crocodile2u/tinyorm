@@ -1,0 +1,15 @@
+<p>Authors managing page is very similar to <a href="books.php">books.php</a>. SQL for authors table:</p>
+<pre>CREATE TABLE book (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255)
+) ENGINE INNODB;</pre>
+<p>Generate <i>Author</i> entity.</p>
+<pre>$ php ../../bin/generate.php --dbname=tinyorm_library --password=*** --table=author --class='library\scaffold\Author' --file=lib/scaffold/Author.php</pre>
+<p>Then, again, we create class <i>library\Author</i> which extends the scaffold one.</p>
+<p><i>author_add.php</i> is almost completely the same as <i>book_add.php</i>.</p>f example.</p>
+<p>To fetch all authors, we use the following code:</p>
+<pre>$books = (new Select("book"))
+    ->orderBy("title")
+    ->execute();</pre>
+<p>This is equivalent of "<i>SELECT * FROM author ORDER BY title</i>".</p>
+<p>Now, it is time to link authors to books. In this application, this is done on <a href="book_edit.php">book_edit.php</a> page.</p>
