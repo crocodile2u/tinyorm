@@ -39,4 +39,13 @@ class Book extends \library\scaffold\Book {
             ->execute()
             ->fetchColumn();
     }
+
+    /**
+     * @return Select
+     */
+    function getEditions()
+    {
+        return (new Select("edition"))
+            ->where("edition.book_id = ?", $this->id);
+    }
 }

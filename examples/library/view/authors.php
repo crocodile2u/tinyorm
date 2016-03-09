@@ -1,4 +1,4 @@
-<h3>Add new book</h3>
+<h3>Add new author</h3>
 <form method="post" action="author_add.php" class="form" id="add-form">
     <label>Name:</label>
     <div class="input-group">

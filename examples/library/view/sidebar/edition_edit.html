@@ -1,0 +1,22 @@
+<p>This page is extremely simple: a form with three inputs. It accepts either <i>id</i> or a <i>book_id</i> parameter via GET. If <i>id</i> is specified, it means we want to change edition with that <i>id</i>. If <i>book_id</i> is specified, it means we want to add new edition to the that book:</p>
+<pre>if (empty($_GET["id"])) {
+    if (empty($_GET["book_id"])) {
+        die("No book ID provided");
+    }
+    $edition = new Edition();
+    $edition->book_id = (int) $_GET["book_id"];
+} else {
+    $edition = Registry::persistenceDriver()->find((int) $_GET["id"], new Edition());
+    if (!$edition) {
+        die("Edition ID #" . (int) $_GET["id"] . " not found");
+    }
+}</pre>
+<p>Form submission is handled by <i>edition_save.php</i>:</p>
+<pre>$edition = new Edition($_POST);
+$edition->id = ((int) $edition->id) ?: null;
+$edition->book_id = (int) $edition->book_id;
+$edition->year = (int) $edition->year;
+$edition->isbn = (string) $edition->isbn;
+$edition->instance_count = (int) $edition->instance_count;
+
+Registry::persistenceDriver()->save($edition);</pre>

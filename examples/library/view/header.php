@@ -36,8 +36,6 @@
                 <li><a href="./">Home</a></li>
                 <li><a href="./books.php">Books</a></li>
                 <li><a href="./authors.php">Authors</a></li>
-                <li><a href="./editions.php">Book editions</a></li>
-                <li><a href="./instances.php">Book instances</a></li>
             </ul>
         </div><!--/.nav-collapse -->
     </div>

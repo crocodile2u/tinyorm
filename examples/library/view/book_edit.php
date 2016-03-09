@@ -21,7 +21,7 @@
         <tr>
             <td><?=htmlspecialchars($author["name"], ENT_QUOTES)?></td>
             <td>
-                <a href="book_author_delete.php?id=<?=$author["id"]?>">Delete</a>
+                <a href="book_author_delete.php?book_id=<?=$book->id?>&amp;author_id=<?=$author["id"]?>">Delete</a>
             </td>
         </tr>
     <?php endforeach; ?>
@@ -42,3 +42,31 @@
            onclick="document.getElementById('add-author-form').submit(); return false;">Save</a>
     </div>
 </form>
+
+<h3>This book in library</h3>
+<p>
+    <a href="edition_edit.php?book_id=<?=$book->id?>">Add new edition</a>
+</p>
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>Year</th>
+        <th>ISBN</th>
+        <th>Instance count</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($bookEditions as $edition) : ?>
+        <tr>
+            <td><?=$edition["year"]?></td>
+            <td><?=htmlspecialchars($edition["isbn"], ENT_QUOTES)?></td>
+            <td><?=$edition["instance_count"]?></td>
+            <td>
+                <a href="edition_edit.php?id=<?=$edition["id"]?>">Edit</a> |
+                <a href="edition_delete.php?id=<?=$edition["id"]?>?>">Delete</a>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>

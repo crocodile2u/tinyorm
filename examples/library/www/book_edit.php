@@ -27,6 +27,7 @@ $allAuthors = (new Select("author"))
     ->fetchAll(\PDO::FETCH_KEY_PAIR);
 
 $bookAuthors = $book->getAuthors()->execute()->fetchAll();
+$bookEditions = $book->getEditions()->execute()->fetchAll();
 
 echo \library\View::render(
     "book_edit.php",
@@ -34,6 +35,7 @@ echo \library\View::render(
         "book" => $book,
         "allAuthors" => $allAuthors,
         "bookAuthors" => $bookAuthors,
+        "bookEditions" => $bookEditions,
     ]
 );
 

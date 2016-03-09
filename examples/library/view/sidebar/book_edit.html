@@ -99,5 +99,38 @@ $book->addAuthor($_POST["author_id"]);</pre>
     }
     ...
 }</pre>
-<p>This method returns <i>Select</i> instance, so that, if needed, the book's author list can be further filtered, ordered etc. We will only need to fetch the full authors list:</p>
+<p>This method returns <i>Select</i> instance, so that the book's author list can be further filtered, ordered etc. We will only need to fetch the full authors list:</p>
 <pre>$bookAuthors = $book->getAuthors()->execute()->fetchAll();</pre>
+<p>After all, we'll need to delete book-to-author relation. <i>book_author_delete.php</i> accepts to GET parameters: <i>book_id</i> and <i>author_id</i>:</p>
+<pre>if (empty($_GET["book_id"])) {
+    die("No book ID provided");
+}
+
+if (empty($_GET["author_id"])) {
+    die("No author ID provided");
+}
+
+$bookHasAuthor = (new Select("book_has_author"))
+    ->where("book_id = ?", (int) $_GET["book_id"])
+    ->where("author_id = ?", (int) $_GET["author_id"])
+    ->setFetchClass(BookHasAuthor::class)
+    ->execute()
+    ->fetch();
+
+if (!$bookHasAuthor) {
+    die("This author is not registered for this book");
+}
+
+Registry::persistenceDriver()->delete($bookHasAuthor);</pre>
+<p>To find the needed row in <i>book_has_author</i> table, we create <i>Select</i> instance, specify <i>WHERE</i> conditions and set the fetch mode so that the results are fetched as <i>BookHasAuthor</i> class instances.</p>
+<p>Every book is published and has one or more editions and instances. Our library can have a book in different editions. For example, for  "<i>War and peace</i>" by Leo Tolstoy we have 2 instances published in 2005 and 1 instance published in 2010. For editions and instances we create a table:</p>
+<pre>CREATE TABLE `edition` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `book_id` int(11) NOT NULL,
+  `year` smallint(6) DEFAULT NULL,
+  `isbn` varchar(255) DEFAULT NULL,
+  `instance_count` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `fk_edition_book` (`book_id`),
+  CONSTRAINT `fk_edition_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</pre>
