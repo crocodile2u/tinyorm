@@ -13,3 +13,88 @@ if (!$book->title) {
 }
 
 Registry::persistenceDriver()->save($book);</pre>
+
+<p>Now we're going to link books to authors. Because an author can have many books, and a book can have many authors, the relationship is Many-to-Many. We'll need an intermediate table: </p>
+<pre>CREATE TABLE `book_has_author` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `book_id` int(11) NOT NULL,
+  `author_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `book_id` (`book_id`,`author_id`),
+  KEY `fk_author` (`author_id`),
+  CONSTRAINT `fk_author` FOREIGN KEY (`author_id`) REFERENCES `author` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</pre>
+
+<p>Next, we create the "add-author-to-book" form with a dropdown to choose from existing authors. Options for the dropdown:</p>
+<pre>$allAuthors = (new Select("author", "id, name"))
+    ->orderBy("name")
+    ->execute()
+    ->fetchAll(\PDO::FETCH_KEY_PAIR);</pre>
+<p><i>$allAuthors</i> variable now contains an array that has author IDs as keys and author names as values. I explicitely specify column list for this <i>Select</i> for better code readability, despite the fact that <i>author</i> table has just these two columns.</p>
+
+<p>Add author form action is <i>book_author_add.php</i>:</p>
+<pre>if (empty($_POST["book_id"])) {
+    die("No book ID provided");
+}
+
+if (empty($_POST["author_id"])) {
+    die("No author ID provided");
+}
+
+/** @var Book $book */
+$book = Registry::persistenceDriver()->find((int) $_POST["book_id"], new Book());
+if (!$book) {
+    die("Book ID #" . (int) $_POST["book_id"] . " not found");
+}
+
+if ($book->hasAuthor($_POST["author_id"])) {
+    die("This book already has this author");
+}
+
+$book->addAuthor($_POST["author_id"]);</pre>
+
+<p>have you noticed the <i>Book->hasAuthor()</i> and <i>Book->addAuthor()</i> method calls? Tinyorm knows nothing about relationships between entities, and this is up to developer to decide how to work with these relationships. For this example, I decided to add methods that deal with Book-to-Author relationship - to the <i>Book</i> class:</p>
+<pre>class Book extends \library\scaffold\Book {
+    ...
+    /**
+     * @param int $authorId
+     */
+    function addAuthor($authorId)
+    {
+        $link = new BookHasAuthor();
+        $link->book_id = $this->id;
+        $link->author_id = (int) $authorId;
+        Registry::persistenceDriver()->save($link);
+    }
+
+    /**
+     * @param int $authorId
+     * @return bool
+     */
+    function hasAuthor($authorId)
+    {
+        return (bool) (new Select("book_has_author", "1"))
+            ->where("book_id = ?", $this->id)
+            ->where("author_id = ?", (int) $authorId)
+            ->execute()
+            ->fetchColumn();
+    }
+}</pre>
+
+<p>Now that we have the ability to add authors to books, we'll need to display authors list for a book. Seems logical to add another method to our <i>Book</i> class:</p>
+<pre>class Book extends \library\scaffold\Book {
+    ...
+    /**
+     * @return Select
+     */
+    function getAuthors()
+    {
+        return (new Select("author", "author.*"))
+            ->join("JOIN book_has_author AS bha ON (bha.author_id = author.id)")
+            ->where("bha.book_id = ?", $this->id);
+    }
+    ...
+}</pre>
+<p>This method returns <i>Select</i> instance, so that, if needed, the book's author list can be further filtered, ordered etc. We will only need to fetch the full authors list:</p>
+<pre>$bookAuthors = $book->getAuthors()->execute()->fetchAll();</pre>

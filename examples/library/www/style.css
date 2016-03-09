@@ -5,3 +5,6 @@ body {
     height: calc(100vh - 160px);
     overflow: auto;
 }
+.content i {
+    color:darkred;
+}

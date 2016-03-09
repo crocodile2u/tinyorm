@@ -33,7 +33,8 @@ class Registry {
             self::$db = new Db(
                 self::$config["db.dsn"],
                 self::$config["db.user"],
-                self::$config["db.password"]
+                self::$config["db.password"],
+                self::$config["db.options"]
             );
         }
         return self::$db;
