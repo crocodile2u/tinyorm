@@ -15,7 +15,7 @@ abstract class Entity
     /**
      * @var array
      */
-    private $data;
+    private $data = [];
     /**
      * @var string
      */
@@ -41,7 +41,11 @@ abstract class Entity
      */
     function __construct(array $data = [])
     {
-        $this->data = array_merge($this->getDefaults(), $data);
+        // the 2nd arg to array_merge() is $this->data:
+        // when PDO performs fetching in mode PDO::FETCH_CLASS, the instance
+        // is created, populated with properties, and only after that the
+        // contructor is called. So, $this->data may already contain some data.
+        $this->data = array_merge($this->getDefaults(), $this->data, $data);
     }
 
     /**
