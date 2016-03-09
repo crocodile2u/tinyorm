@@ -65,6 +65,7 @@ class Select
     function setFetchMode($mode, $arg1 = null, $arg2 = null)
     {
         $this->fetchMode = [$mode, $arg1, $arg2];
+        return $this;
     }
 
     /**
