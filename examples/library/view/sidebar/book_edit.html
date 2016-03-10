@@ -1,4 +1,4 @@
-<p>This page allows us to edit a book title. Also, we need to have user interface to link authors to their book. This interface is also here.</p>
+<p>This is the largest page of our app. It allows us to edit a book title, link/unlink authors to the book, the book's instance list is alos here.</p>
 <p>The edit-book form contains just a text <i>input name=title</i>, and a hidden <i>input name=id</i>. This form submission is handled by <i>book_save.php</i>:</p>
 <pre>$id = (int) $_POST["id"];
 $book = Registry::persistenceDriver()->find($id, new Book());
@@ -134,3 +134,18 @@ Registry::persistenceDriver()->delete($bookHasAuthor);</pre>
   KEY `fk_edition_book` (`book_id`),
   CONSTRAINT `fk_edition_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8</pre>
+<p>Next, below the "<i>Add author</i>" section we have another section - "<i>This book in library</i>". Here, we' will list all the editions of the book that we have. Above this list, I placed a hyperlink to <i>edition_edit.php</i> and called it "<i>Add new edition</i>".</p>
+<p>In order to get all the editions of the book, we add another method to the <i>Book</i> entity:</p>
+<pre>class Book extends \library\scaffold\Book {
+    ...
+    /**
+     * @return Select
+     */
+    function getEditions()
+    {
+        return (new Select("edition"))
+            ->where("edition.book_id = ?", $this->id);
+    }
+}</pre>
+<p>And now we're able to pass the edition list to the view:</p>
+<pre>$bookEditions = $book->getEditions()->execute()->fetchAll();</pre>

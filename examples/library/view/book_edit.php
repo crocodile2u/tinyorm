@@ -64,7 +64,7 @@
             <td><?=$edition["instance_count"]?></td>
             <td>
                 <a href="edition_edit.php?id=<?=$edition["id"]?>">Edit</a> |
-                <a href="edition_delete.php?id=<?=$edition["id"]?>?>">Delete</a>
+                <a href="edition_delete.php?id=<?=$edition["id"]?>">Delete</a>
             </td>
         </tr>
     <?php endforeach; ?>

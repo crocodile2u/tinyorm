@@ -13,3 +13,16 @@
     ->execute();</pre>
 <p>This is equivalent of "<i>SELECT * FROM author ORDER BY title</i>".</p>
 <p>Now, it is time to link authors to books. In this application, this is done on <i>book_edit.php</i> page.</p>
+<p>Our author list has "<i>Delete</i>" links in it. Those lead to <i>author_delete.php</i>:</p>
+<pre>if (empty($_GET["id"])) {
+    die("No author ID provided");
+}
+
+/** @var Author $author */
+$author = Registry::persistenceDriver()->find((int) $_GET["id"], new Author());
+
+if (!$author) {
+    die("Author #" . (int) $_GET["id"] . " not found");
+}
+
+Registry::persistenceDriver()->delete($author);</pre>

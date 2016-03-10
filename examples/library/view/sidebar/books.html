@@ -29,3 +29,22 @@
     ->setFetchClass(Book::class)
     ->orderBy("title")->execute();</pre>
 <p>The second main entity of our library app is <i>Author</i>. It is very similar to the Book entity, take a look at the <a href="authors.php">authors.php</a> page</p>
+<p>Our book list has "<i>Delete</i>" links in it. Those lead to <i>book_delete.php</i>:</p>
+<pre>if (empty($_GET["id"])) {
+    die("No book ID provided");
+}
+
+/** @var Book $book */
+$book = Registry::persistenceDriver()->find((int) $_GET["id"], new Book());
+
+if (!$book) {
+    die("Book #" . (int) $_GET["id"] . " not found");
+}
+
+$editionCount = $book->getEditions()->count();
+if ($book->getEditions()->count()) {
+    die("Cannot delete this book because it still has $editionCount edition(s) listed!");
+}
+
+Registry::persistenceDriver()->delete($book);</pre>
+<p>Here, you can find an interesting feature used: <i>$editionCount = $book->getEditions()->count()</i>. Remember, the <i>Book->getEditions()</i> method returns an instance of <i>Select</i> class, and that class has a <i>count()</i> method. In the end, this is equivalent to issuing the following query agains our database: "<i>SELECT COUNT(*) FROM edition WHERE book_id = ?</i>". It will not just fetch all matching rows and count them.</p>
