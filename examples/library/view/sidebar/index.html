@@ -21,3 +21,21 @@
 <h3>Let's go</h3>
 <p>First, I will add a tiny View class which is capable of rendering PHP template files in the <i>view</i> folder. It's only method is <i>static render($template, $vars)</i>. Even in a small app it is better to separate views, controllers and models. In this app controllers are php files like <i>index.php</i>, <i>book_add.php</i> etc. Some of them just render some views and output HTML, some handle POST requests and perform redirects when done. The Model part of MVC in our case is presented by <i>tinyorm</i>. In order to have easy access to DB connection and the tinyorm persistence driver, I will add a <i>Registry</i> class with static methods <i>db()</i> and <i>persistenceDriver()</i>. Because on every page we'll need certain basic functionality like class autoloading and configuration, I will create <i>bootstrap.php</i> which load configuration files etc. This file is included on every php page we'll create.</p>
 <p>A library is about books, true? Then we will start with creating our "<a href="books.php">Books</a>" page!</p>
+
+<p><b>If you haven't yet read about "<a href="books.php">Books</a>" page, please proceed there</b>.</p>
+<p>...</p>
+
+<p>And, once you're back to this page, let's cover what you see on the right:</p>
+<pre>$bookCount = (new Select("book"))->count();
+$authorCount = (new Select("author"))->count();
+$editionCount = (new Select("edition"))->count();
+$stats = (new Select(
+    "edition",
+    "AVG(instance_count) AS avg_instance_count,
+        SUM(instance_count) AS total_instance_count"))
+    ->execute()
+    ->fetch();
+$instanceCount = $stats["total_instance_count"];
+$instanceAvg = $stats["avg_instance_count"];</pre>
+
+<p>That is it. Contact me if you have questions on tinyorm: <a href="mailto:crocodile2u@gmail.com?subject=tinyorm">crocodile2u@gmail.com</a></p>

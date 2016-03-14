@@ -48,3 +48,5 @@ if ($book->getEditions()->count()) {
 
 Registry::persistenceDriver()->delete($book);</pre>
 <p>Here, you can find an interesting feature used: <i>$editionCount = $book->getEditions()->count()</i>. Remember, the <i>Book->getEditions()</i> method returns an instance of <i>Select</i> class, and that class has a <i>count()</i> method. In the end, this is equivalent to issuing the following query agains our database: "<i>SELECT COUNT(*) FROM edition WHERE book_id = ?</i>". It will not just fetch all matching rows and count them.</p>
+
+<p>Now that we've finished with the <i>books.php</i> page, it's time to return to the example <a href="./">Home page</a>.</p>
