@@ -68,3 +68,6 @@ Persistence driver operates on Entities. In case of ZF2, we can talk about their
 For a query object, I took a look at Phalcon framework ( https://docs.phalconphp.com/en/latest/api/Phalcon_Mvc_Model_Query_Builder.html ). However, I modified the interface a little, so I find it a little bit better.
 
 I also implemented a database transaction manager capable of handling multiple DB connections.
+
+# Credits
+Thanks RasmiKanta Moharana (https://github.com/rashmi8105) for early feedback & spotting bugs in the example app! 

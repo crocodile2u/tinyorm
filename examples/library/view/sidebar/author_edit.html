@@ -1,0 +1,21 @@
+<p>This page is extremely simple: a very basic HTML form. It accepts <i>id</i> parameter via GET.</p>
+<pre>if (empty($_GET["id"])) {
+    die("No author ID provided");
+} else {
+    $author = Registry::persistenceDriver()->find((int) $_GET["id"], new Author());
+    if (!$author) {
+        die("Author ID #" . (int) $_GET["id"] . " not found");
+    }
+}</pre>
+<p>Form submission is handled by <i>author_save.php</i>:</p>
+<pre>$author = new Author($_POST);
+$author->id = ((int) $author->id) ?: null;
+$author->name = trim((string) $author->name);
+
+if ($author->name) {
+    Registry::persistenceDriver()->save($author);
+    header("Location: authors.php");
+    exit;
+} else {
+    echo "Empty name";
+}</pre>

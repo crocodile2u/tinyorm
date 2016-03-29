@@ -1,5 +1,5 @@
 <h3>Add new author</h3>
-<form method="post" action="author_add.php" class="form" id="add-form">
+<form method="post" action="author_save.php" class="form" id="add-form">
     <label>Name:</label>
     <div class="input-group">
         <input type="text" name="name" class="form-control">
