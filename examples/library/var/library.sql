@@ -15,6 +15,7 @@ CREATE TABLE edition (
   year SMALLINT,
   title VARCHAR(255),
   isbn VARCHAR(255),
+  instance_count INT UNSIGNED NOT NULL DEFAULT 0,
   FOREIGN KEY fk_edition_book (book_id) REFERENCES book (id) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE INNODB;
 
