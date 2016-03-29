@@ -8,7 +8,12 @@
  */
 
 namespace tinyorm\test;
-
+/**
+ * Class TestEntity
+ * @package tinyorm\test
+ *
+ * @method static TestEntity find(int $id)
+ */
 class TestEntity extends \tinyorm\Entity {
     protected $dbName = 'test';
     protected $sourceName = 'test';
