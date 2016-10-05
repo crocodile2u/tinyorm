@@ -195,4 +195,9 @@ abstract class Entity
     {
         return $this->data[$name] = $value;
     }
+
+    function __isset($name)
+    {
+        return array_key_exists($name, $this->data);
+    }
 }
