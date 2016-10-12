@@ -100,6 +100,15 @@ abstract class Entity
 
     /**
      * @param Driver|null $driver
+     * @return Entity
+     */
+    function increment($column, $amount = 1, Driver $driver = null)
+    {
+        return self::resolvePersistenceDriver($driver)->increment($this, $column, $amount);
+    }
+
+    /**
+     * @param Driver|null $driver
      * @return bool
      */
     function delete(Driver $driver = null)

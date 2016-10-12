@@ -24,6 +24,11 @@ interface Driver
     function save(Entity $entity, &$affectedRowCount = null);
     /**
      * @param Entity $entity
+     * @return Entity
+     */
+    function increment(Entity $entity, $column, $amount = 1);
+    /**
+     * @param Entity $entity
      * @return bool
      */
     function update(Entity $entity, &$affectedRowCount = null);

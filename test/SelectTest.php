@@ -47,6 +47,8 @@ class SelectTest extends BaseTestCase
     protected function setUp()
     {
         parent::setUp();
+        $this->connection->exec("ALTER TABLE test AUTO_INCREMENT = 1");
+        $this->connection->exec("ALTER TABLE test2 AUTO_INCREMENT = 1");
         for ($i = 0; $i < self::ROWCOUNT; $i++) {
             $c_int = $i % self::DENOMINATOR;
             $c_varchar = "varchar " . $c_int;

@@ -50,6 +50,26 @@ class DbDriver implements Driver
 
     /**
      * @param Entity $entity
+     * @param string $column
+     * @param int $amount
+     * @return bool
+     */
+    function increment(Entity $entity, $column, $amount = 1)
+    {
+        $sql = "UPDATE {$entity->getSourceName()} 
+            SET {$column} = {$column} + ? 
+            WHERE {$entity->getPKName()} = ?";
+        $stmt = $this->db->prepare($sql);
+        if ($stmt->execute([$amount, $entity->getPK()])) {
+            $entity->$column += $amount;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param Entity $entity
      * @param int &$affectedRowCount
      * @return Entity|bool
      */

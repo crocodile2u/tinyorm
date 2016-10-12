@@ -64,6 +64,22 @@ abstract class PersistenceDriverTest extends BaseTestCase {
         $this->assertEquals("updated", $updatedEntity->c_varchar);
     }
 
+    function testIncrement()
+    {
+        $this->skipTestIfNeeded();
+        $intColumn = 1;
+        $increment = 10;
+        $id = $this->insert("v1", $intColumn, "u1");
+        $persistenceDriver = $this->createPersistenceDriver();
+        $memoryEntity = $persistenceDriver->find($id, new TestEntity());
+
+        $this->assertTrue($persistenceDriver->increment($memoryEntity, "c_int", $increment));
+        $this->assertEquals($intColumn + $increment, $memoryEntity->c_int);
+
+        $dbEntity = $persistenceDriver->find($id, new TestEntity());
+        $this->assertEquals($intColumn + $increment, $dbEntity->c_int);
+    }
+
     function testDelete()
     {
         $this->skipTestIfNeeded();

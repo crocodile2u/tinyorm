@@ -58,6 +58,19 @@ class ZHandlersocketDriver implements Driver
 
     /**
      * @param Entity $entity
+     * @param string $column
+     * @param int $amount
+     * @return bool
+     */
+    function increment(Entity $entity, $column, $amount = 1)
+    {
+        $this->getIndex($entity)->incrementById($entity->getPK(), [$column => $amount]);
+        $entity->$column += $amount;
+        return true;
+    }
+
+    /**
+     * @param Entity $entity
      * @param int &$affectedRowCount
      * @return Entity|bool
      */

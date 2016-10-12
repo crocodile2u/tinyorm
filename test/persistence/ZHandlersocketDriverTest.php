@@ -2,30 +2,23 @@
 
 namespace tinyorm\test\persistence;
 
-use tinyorm\persistence\DbDriver;
 use tinyorm\persistence\ZHandlersocketDriver;
 use tinyorm\test\PersistenceDriverTest;
 
 class ZHandlersocketDriverTest extends PersistenceDriverTest {
-
-    private $zClient;
 
     protected function isTestSkipped()
     {
         return !class_exists(\ZHandlersocket\Client::class);
     }
 
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->zClient = new \ZHandlersocket\Client();
-    }
-
     /**
-     * @return DbDriver
+     * @return ZHandlersocketDriver
      */
     protected function createPersistenceDriver() {
-        return new ZHandlersocketDriver($this->zClient, "test");
+        $client = new \ZHandlersocket\Client();
+        $client->setLogger(new \Zhandlersocket\DebugLogger());
+        return new ZHandlersocketDriver($client, "test");
     }
 
 

@@ -30,6 +30,17 @@ class EntityTest extends BaseTestCase {
         $this->assertGreaterThan(0, $entity->getPK());
     }
 
+    function testIncrement()
+    {
+        $id = $this->assertEntitySaved();
+        $memoryEntity = TestEntity::find($id);
+        $this->assertTrue($memoryEntity->increment("c_int", 10));
+        $this->assertEquals(10, $memoryEntity->c_int);
+
+        $dbEntity = TestEntity::find($id);
+        $this->assertEquals(10, $dbEntity->c_int);
+    }
+
     function testDelete()
     {
         $entity = new TestEntity([
@@ -46,7 +57,8 @@ class EntityTest extends BaseTestCase {
     function assertEntitySaved()
     {
         $entity = new TestEntity([
-            "c_unique" => "UNIQUE"
+            "c_unique" => "UNIQUE",
+            "c_int" => 0,
         ]);
         $this->persistenceDriver->save($entity, $rowCount);
         $this->assertEquals(1, $rowCount);
