@@ -24,7 +24,7 @@ abstract class Entity
     /**
      * @var string
      */
-    protected $sourceName;
+    static protected $sourceName;
     /**
      * @var string
      */
@@ -77,6 +77,14 @@ abstract class Entity
     }
 
     /**
+     * @return string
+     */
+    static function getSourceName()
+    {
+        return static::$sourceName;
+    }
+
+    /**
      * Entity constructor.
      * @param array $data
      */
@@ -122,14 +130,6 @@ abstract class Entity
     function getColumns()
     {
         return array_keys($this->getDefaults());
-    }
-
-    /**
-     * @return string
-     */
-    function getSourceName()
-    {
-        return $this->sourceName;
     }
 
     /**

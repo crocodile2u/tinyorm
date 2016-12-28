@@ -99,7 +99,7 @@ class EntityGenerator {
             " */\n" .
             ($ns ? "namespace $ns;\n" : "") .
             "class {$className} extends \\tinyorm\\Entity {\n" .
-            "    protected \$sourceName = " . $this->varExport($this->table) . ";\n" .
+            "    static protected \$sourceName = " . $this->varExport($this->table) . ";\n" .
             "    protected \$pkName = " . $this->varExport($pk) . ";\n" .
             "    protected \$autoUpdatedCols = " . $this->varExport($autoUpdatedCols) . ";\n" .
             "    function getDefaults() {\n" .

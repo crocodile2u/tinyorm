@@ -91,6 +91,22 @@ abstract class PersistenceDriverTest extends BaseTestCase {
         $this->assertNull($persistenceDriver->find($id, new TestEntity()));
     }
 
+    function testFindAllByColumn()
+    {
+        $this->skipTestIfNeeded();
+        $id1 = $this->insert("v1", 1, "u1");
+        $id2 = $this->insert("v2", 1, "u2");
+        $persistenceDriver = $this->createPersistenceDriver();
+        $entities = [];
+        $found = $persistenceDriver->findAllByColumn("c_int", 1, new TestEntity());
+        foreach ($found as $item) {
+            $entities[$item->id] = $item;
+        }
+        $this->assertEquals(2, count($entities));
+        $this->assertTrue(array_key_exists($id1, $entities));
+        $this->assertTrue(array_key_exists($id2, $entities));
+    }
+
     protected function insert($varchar, $int, $unique) {
         $this->connection->exec("INSERT INTO test (c_varchar, c_int, c_unique)
               VALUES ('$varchar', $int, '$unique')");

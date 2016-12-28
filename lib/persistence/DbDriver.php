@@ -20,11 +20,21 @@ class DbDriver implements Driver
      */
     private $db;
 
+    /**
+     * DbDriver constructor.
+     * @param Db $db
+     */
     function __construct(Db $db)
     {
         $this->db = $db;
     }
 
+    /**
+     * Find entity by ID.
+     * @param int $id
+     * @param Entity $proto
+     * @return null
+     */
     function find($id, Entity $proto)
     {
         $sql = "SELECT * FROM {$proto->getSourceName()} WHERE {$proto->getPKName()} = ?";
@@ -32,6 +42,22 @@ class DbDriver implements Driver
         $stmt->execute([$id]);
         $stmt->setFetchMode(\PDO::FETCH_INTO, $proto);
         return $stmt->fetch() ?: null;
+    }
+    /**
+     * Find all entities with column = value.
+     *
+     * @param int $id
+     * @return Entity[]
+     */
+    function findAllByColumn($column, $value, Entity $proto)
+    {
+        $sql = "SELECT * FROM {$proto->getSourceName()} WHERE {$column} = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$value]);
+        $stmt->setFetchMode(\PDO::FETCH_INTO, $proto);
+        while ($item = $stmt->fetch()) {
+            yield $item;
+        }
     }
 
     /**

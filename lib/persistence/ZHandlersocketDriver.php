@@ -14,6 +14,11 @@ use tinyorm\Entity;
 class ZHandlersocketDriver implements Driver
 {
     /**
+     * A limit must be specified when fetching from HS, so this is needed by findAllByColumn().
+     * Well, if you're trying to fetch more then 2 ** 31, you're undoubtedly in trouble anyway.
+     */
+    const FIND_ALL_LIMIT = 2147483647;
+    /**
      * @var \Zhandlersocket\Client
      */
     private $zClient;
@@ -22,23 +27,56 @@ class ZHandlersocketDriver implements Driver
      */
     private $dbName;
 
+    /**
+     * ZHandlersocketDriver constructor.
+     * @param \Zhandlersocket\Client $client
+     * @param string $dbName
+     */
     function __construct(\Zhandlersocket\Client $client, $dbName)
     {
         $this->zClient = $client;
         $this->dbName = $dbName;
     }
 
+    /**
+     * @param string $dbName
+     * @return $this
+     */
     function setDbName($dbName)
     {
         $this->dbName = $dbName;
         return $this;
     }
 
+    /**
+     * @param int $id
+     * @param Entity $proto
+     * @return $this
+     */
     function find($id, Entity $proto)
     {
         $row = $this->getIndex($proto)->find($id);
         if ($row) {
             return $proto->importArray($row);
+        }
+    }
+    /**
+     * Find all entities with column = value.
+     *
+     * For ZHandlersocketDriver, you have to specify INDEX name in $column arg, not the column name.
+     * Obviously, the column must have an index on it to be searchable via this driver.
+     *
+     * Because of the limitations of HS,
+     *
+     * @param int $id
+     * @return Entity[]
+     */
+    function findAllByColumn($column, $value, Entity $proto)
+    {
+        $index = $this->getIndex($proto, $column);
+        $where = $index->createWhereClause("=", [$value])->setLimit(self::FIND_ALL_LIMIT);
+        foreach ($this->getIndex($proto, $column)->findByWhereClause($where) as $row) {
+            yield (clone $proto)->importArray($row);
         }
     }
 
@@ -121,14 +159,15 @@ class ZHandlersocketDriver implements Driver
 
     /**
      * @param Entity $proto
+     * @param string $index
      * @retrun \Zhandlersocket\Index
      */
-    protected function getIndex(Entity $proto)
+    protected function getIndex(Entity $proto, $index = "PRIMARY")
     {
         return $this->zClient->getIndex(
             $this->dbName,
             $proto->getSourceName(),
-            "PRIMARY",
+            $index,
             $proto->getColumns()
         );
     }

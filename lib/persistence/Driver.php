@@ -18,6 +18,11 @@ interface Driver
      */
     function find($id, Entity $proto);
     /**
+     * @param int $id
+     * @return Entity
+     */
+    function findAllByColumn($column, $value, Entity $proto);
+    /**
      * @param Entity $entity
      * @return Entity
      */
