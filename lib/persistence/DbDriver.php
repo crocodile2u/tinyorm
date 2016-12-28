@@ -46,10 +46,12 @@ class DbDriver implements Driver
     /**
      * Find all entities with column = value.
      *
-     * @param int $id
+     * @param string $column
+     * @param mixed $value
+     * @param int $limit
      * @return Entity[]
      */
-    function findAllByColumn($column, $value, Entity $proto)
+    function findAllByColumn($column, $value, Entity $proto, $limit = null)
     {
         $sql = "SELECT * FROM {$proto->getSourceName()} WHERE {$column} = ?";
         $stmt = $this->db->prepare($sql);
@@ -58,6 +60,17 @@ class DbDriver implements Driver
         while ($item = $stmt->fetch()) {
             yield $item;
         }
+    }
+    /**
+     * @param string $column
+     * @param mixed $value
+     * @return Entity|null
+     */
+    function findByColumn($column, $value, Entity $proto)
+    {
+        /** @var \Generator $generator */
+        $generator = $this->findAllByColumn($column, $value, $proto, 1);
+        return $generator->current();
     }
 
     /**

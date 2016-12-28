@@ -68,16 +68,29 @@ class ZHandlersocketDriver implements Driver
      *
      * Because of the limitations of HS,
      *
-     * @param int $id
+     * @param string $column
+     * @param mixed $value
+     * @param int $limit
      * @return Entity[]
      */
-    function findAllByColumn($column, $value, Entity $proto)
+    function findAllByColumn($column, $value, Entity $proto, $limit = null)
     {
         $index = $this->getIndex($proto, $column);
-        $where = $index->createWhereClause("=", [$value])->setLimit(self::FIND_ALL_LIMIT);
+        $where = $index->createWhereClause("=", [$value])->setLimit($limit ?: self::FIND_ALL_LIMIT);
         foreach ($this->getIndex($proto, $column)->findByWhereClause($where) as $row) {
             yield (clone $proto)->importArray($row);
         }
+    }
+    /**
+     * @param string $column
+     * @param mixed $value
+     * @return Entity|null
+     */
+    function findByColumn($column, $value, Entity $proto)
+    {
+        /** @var \Generator $generator */
+        $generator = $this->findAllByColumn($column, $value, $proto, 1);
+        return $generator->current();
     }
 
     /**

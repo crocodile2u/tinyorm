@@ -18,10 +18,18 @@ interface Driver
      */
     function find($id, Entity $proto);
     /**
-     * @param int $id
+     * @param string $column
+     * @param mixed $value
+     * @param int $limit
+     * @return Entity[]
+     */
+    function findAllByColumn($column, $value, Entity $proto, $limit = null);
+    /**
+     * @param string $column
+     * @param mixed $value
      * @return Entity
      */
-    function findAllByColumn($column, $value, Entity $proto);
+    function findByColumn($column, $value, Entity $proto);
     /**
      * @param Entity $entity
      * @return Entity
