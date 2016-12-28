@@ -64,6 +64,31 @@ abstract class Entity
     }
 
     /**
+     * @param string $column
+     * @param mixed $value
+     * @param Driver|null $driver
+     * @param int $limit
+     * @return Entity[]
+     */
+    static function findAllByColumn($column, $value, Driver $driver = null, $limit = null)
+    {
+        return self::resolvePersistenceDriver($driver)->findAllByColumn($column, $value, new static(), $limit);
+    }
+
+
+    /**
+     * @param string $column
+     * @param mixed $value
+     * @param Driver|null $driver
+     * @param int $limit
+     * @return Entity
+     */
+    static function findByColumn($column, $value, Driver $driver = null)
+    {
+        return self::resolvePersistenceDriver($driver)->findByColumn($column, $value, new static());
+    }
+
+    /**
      * @param Driver $explicit
      * @return Driver
      */
