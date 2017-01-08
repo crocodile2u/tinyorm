@@ -118,19 +118,16 @@ class DbDriver implements Driver
             throw new \LogicException("Cannot update entity: PK is empty");
         }
 
-        $data = $entity->toArray();
-        $autoUpdatedCols = $entity->getAutoUpdatedCols(true);
-        $sqlUpdate = [];
-        foreach (array_keys($data) as $col) {
-            if (isset($autoUpdatedCols[$col])) {
-                continue;
-            }
-            $sqlUpdate[] = "$col = :$col";
+        $toUpdate = array_diff_key($entity->toArray(), $entity->getAutoUpdatedCols(true));
+        $set = [];
+        foreach (array_keys($toUpdate) as $column) {
+            $set[] = "$column = :$column";
         }
-        $sql = "UPDATE {$entity->getSourceName()} SET " . join(", ", $sqlUpdate) .
+
+        $sql = "UPDATE {$entity->getSourceName()} SET " . join(", ", $set) .
             " WHERE {$entity->getPKName()} = :{$entity->getPKName()}";
         $stmt = $this->db->prepare($sql);
-        $result = $stmt->execute($data);
+        $result = $stmt->execute($toUpdate);
         if (!$result) {
             throw new \RuntimeException("UDPATE entity: DB query failed (PK: {$entity->getPK()})");
         }
@@ -149,20 +146,17 @@ class DbDriver implements Driver
             throw new \LogicException("Cannot insert entity: PK is not empty");
         }
 
-        $data = $entity->toArray();
-        $autoUpdatedCols = $entity->getAutoUpdatedCols(true);
-        $keys = array_keys($data);
-        $sqlValues = [];
-        foreach ($keys as $col) {
-            if (isset($autoUpdatedCols[$col])) {
-                continue;
-            }
-            $sqlValues[] = ":$col";
+        $toInsert = array_diff_key($entity->toArray(), $entity->getAutoUpdatedCols(true));
+        $columns = [];
+        $placeholders = [];
+        foreach (array_keys($toInsert) as $column) {
+            $columns[] = $column;
+            $placeholders[] = ":$column";
         }
-        $sql = "INSERT INTO {$entity->getSourceName()} (" . join(", ", $keys) . ") " .
-            " VALUES (" . join(", ", $sqlValues) . ")";
+        $sql = "INSERT INTO {$entity->getSourceName()} (" . join(", ", $columns) . ") " .
+            " VALUES (" . join(", ", $placeholders) . ")";
         $stmt = $this->db->prepare($sql);
-        $result = $stmt->execute($data);
+        $result = $stmt->execute($toInsert);
         if (!$result) {
             throw new \RuntimeException("INSERT entity: DB query failed");
         }
