@@ -225,7 +225,12 @@ class Db implements DbInterface
     public function rollBack()
     {
         $timer = $this->debugLog("About to rollBack");
-        if ($this->getPdo()->inTransaction()) {
+        if ($this->shouldStartTransaction) {
+            $this->depth = 0;
+            $this->shouldStartTransaction = 0;
+            $this->debugTimerEnd($timer, "Performing fake rollback (real transaction was not started)");
+            return true;
+        } elseif ($this->getPdo()->inTransaction()) {
             $ret = $this->getPdo()->rollBack();
             $this->queryCount++;
             if ($ret) {

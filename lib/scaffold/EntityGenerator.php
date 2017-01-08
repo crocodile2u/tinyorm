@@ -40,7 +40,6 @@ class EntityGenerator {
         }
 
         $autoUpdatedCols = isset($this->auto) ? explode(",", $this->auto) : [];
-        $autoUpdatedCols = array_flip($autoUpdatedCols);
 
         $pk = null;
         $cols = [];
@@ -63,10 +62,10 @@ class EntityGenerator {
                         $default = "now";
                     }
                     if ($row["Extra"] == "on update CURRENT_TIMESTAMP") {
-                        $autoUpdatedCols[$col] = true;
+                        $autoUpdatedCols[] = $col;
                     }
                 } else {
-                    $default = $default ? : null;
+                    $default = (null === $default) ? null : $default;
                 }
             }
 
