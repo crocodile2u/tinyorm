@@ -32,6 +32,21 @@ class Select
      */
     private $db;
     private $fetchMode;
+
+    /**
+     * Run arbitrary SQL statement.
+     * @param string $sql
+     * @param array $bind
+     * @param Db|null $db
+     * @return \PDOStatement
+     */
+    static function query(string $sql, array $bind = [], Db $db = null)
+    {
+        $db = $db ?? self::$defaultConnection;
+        $stmt = $db->prepare($sql);
+        $stmt->execute($bind);
+        return $stmt;
+    }
     /**
      * Select constructor.
      * @param string $from
