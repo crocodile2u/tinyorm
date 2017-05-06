@@ -11,7 +11,7 @@ namespace tinyorm;
 
 use tinyorm\persistence\Driver;
 
-abstract class Entity
+abstract class Entity implements \JsonSerializable
 {
     /**
      * @var \tinyorm\persistence\Driver
@@ -233,5 +233,10 @@ abstract class Entity
     function __isset($name)
     {
         return array_key_exists($name, $this->data);
+    }
+
+    function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }
