@@ -58,10 +58,7 @@ class TxManager
     function commit() {
         $this->depth--;
         if ($this->depth < 0) {
-            $this->depth = 0;
             throw new \LogicException("Cannot commit: no transaction was started");
-        } elseif ($this->depth > 0) {
-            return true;
         }
         foreach ($this->connections as $connection) {
             if ($connection->inTransaction() && !$connection->commit()) {
@@ -69,7 +66,6 @@ class TxManager
                 throw new \RuntimeException("Unable to commit transaction");
             }
         }
-        return true;
     }
     public function inTransaction()
     {
