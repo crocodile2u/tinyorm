@@ -56,7 +56,7 @@ class DbDriver implements Driver
         $sql = "SELECT * FROM {$proto->getSourceName()} WHERE {$column} = ?";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$value]);
-        $stmt->setFetchMode(\PDO::FETCH_INTO, $proto);
+        $stmt->setFetchMode(\PDO::FETCH_CLASS, get_class($proto));
         while ($item = $stmt->fetch()) {
             yield $item;
         }
