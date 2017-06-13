@@ -46,8 +46,6 @@ class Db implements DbInterface
 
     private $txManager;
 
-    private $depth = 0;
-
     private $shouldStartTransaction = 0;
     /**
      * @var LogInterface
@@ -93,7 +91,6 @@ class Db implements DbInterface
     {
         $this->pdo = null;
         $this->txManager = null;
-        $this->depth = null;
         $this->shouldStartTransaction = 0;
         $this->id = self::$nextId++;
     }
@@ -134,24 +131,20 @@ class Db implements DbInterface
     {
         $timer = $this->debugLog("Commit");
 
-        if ($this->depth > 0) {
-            $this->depth--;
-        } elseif ($this->shouldStartTransaction) {
+        if ($this->shouldStartTransaction) {
             $this->debugLog("Not actually commiting the transaction, because the real DB transaction was not started");
             $this->shouldStartTransaction = false;
             return true;
         }
 
-        if (0 === $this->depth) {
-            if ($this->inTransaction()) {
-                $this->debugLog("About to commit transaction");
-                $ret = $this->getPdo()->commit();
-                $this->queryCount++;
-                $this->debugTimerEnd($timer, "Transaction commited, commit() returned " . (int) $ret);
-                return $ret;
-            } else {
-                throw new \LogicException("Cannot commit: transaction not started");
-            }
+        if ($this->inTransaction()) {
+            $this->debugLog("About to commit transaction");
+            $ret = $this->getPdo()->commit();
+            $this->queryCount++;
+            $this->debugTimerEnd($timer, "Transaction commited, commit() returned " . (int) $ret);
+            return $ret;
+        } else {
+            throw new \LogicException("Cannot commit: transaction not started");
         }
     }
 
@@ -226,16 +219,12 @@ class Db implements DbInterface
     {
         $timer = $this->debugLog("About to rollBack");
         if ($this->shouldStartTransaction) {
-            $this->depth = 0;
             $this->shouldStartTransaction = 0;
             $this->debugTimerEnd($timer, "Performing fake rollback (real transaction was not started)");
             return true;
         } elseif ($this->getPdo()->inTransaction()) {
             $ret = $this->getPdo()->rollBack();
             $this->queryCount++;
-            if ($ret) {
-                $this->depth = 0;
-            }
             $this->debugTimerEnd($timer, "Transaction rolled back: " . (int) $ret);
             return $ret;
         } else {
@@ -330,13 +319,22 @@ class Db implements DbInterface
         return $this->pdo;
     }
 
+    public function emulateCommit()
+    {
+        $this->shouldStartTransaction = false;
+    }
+
+    public function emulateRollback()
+    {
+        $this->shouldStartTransaction = false;
+    }
+
     protected function beginTransactionIfNeeded()
     {
         if ($this->shouldStartTransaction) {
             $this->debugLog("Actually starting a transaction");
             $this->getPdo()->beginTransaction();
             $this->queryCount++;
-            $this->depth++;
             $this->shouldStartTransaction = false;
         }
     }

@@ -29,6 +29,21 @@ interface DbInterface
     public function commit();
 
     /**
+     * Called when commiting a multi-connection-transaction, for connections that did not have a need to actually
+     * start a transaction.
+     * @return mixed
+     */
+    public function emulateCommit();
+
+
+    /**
+     * Called when rolling back a multi-connection-transaction, for connections that did not have a need to actually
+     * start a transaction.
+     * @return mixed
+     */
+    public function emulateRollback();
+
+    /**
      * @return int
      */
     public function errorCode();

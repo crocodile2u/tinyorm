@@ -64,9 +64,13 @@ class TxManager
             return true;
         }
         foreach ($this->connections as $connection) {
-            if ($connection->inTransaction() && !$connection->commit()) {
-                $this->rollback();
-                throw new \RuntimeException("Unable to commit transaction");
+            if ($connection->inTransaction()) {
+                if (!$connection->commit()) {
+                    $this->rollback();
+                    throw new \RuntimeException("Unable to commit transaction");
+                }
+            } else {
+                $connection->emulateCommit();
             }
         }
         return true;
@@ -79,6 +83,8 @@ class TxManager
         foreach ($this->connections as $connection) {
             if ($connection->inTransaction()) {
                 $connection->rollBack();
+            } else {
+                $connection->emulateRollback();
             }
         }
         $this->depth = 0;
