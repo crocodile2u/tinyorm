@@ -68,6 +68,7 @@ class Db implements DbInterface
         $this->dsn = $dsn;
         $this->user = $user;
         $this->password = $password;
+        $options[\PDO::ATTR_STATEMENT_CLASS] = [Statement::class, [$this]];
         $this->options = $options;
         $this->id = self::$nextId++;
         $this->queryCount = 0;
@@ -194,6 +195,7 @@ class Db implements DbInterface
     {
         $timer = $this->debugLog("prepare");
         $this->beginTransactionIfNeeded();
+        /** @var Statement $ret */
         $ret = $this->getPdo()->prepare($statement, $driver_options);
         $this->queryCount++;
         $this->debugTimerEnd($timer, "prepare(): " . $statement);
@@ -329,7 +331,7 @@ class Db implements DbInterface
         $this->shouldStartTransaction = false;
     }
 
-    protected function beginTransactionIfNeeded()
+    public function beginTransactionIfNeeded()
     {
         if ($this->shouldStartTransaction) {
             $this->debugLog("Actually starting a transaction");
