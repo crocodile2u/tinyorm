@@ -9,7 +9,7 @@ function get_test_connection() {
     return new \tinyorm\Db(
         "mysql:host=localhost;dbname=test;",
         "root",
-        "masha",
+        "",
         [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
         ]
