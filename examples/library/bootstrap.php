@@ -10,7 +10,7 @@ ini_set("log_errors", "Off");
 define("TODOLIST_ROOT", __DIR__ . "/");
 
 // tinyorm autoload
-include_once TODOLIST_ROOT . "../../lib/autoload.inc";
+include_once TODOLIST_ROOT . "../../vendor/autoload.php";
 
 // application autoload
 include_once TODOLIST_ROOT . "lib/autoload.inc";

@@ -1,6 +1,6 @@
 <?php
 
-include_once __DIR__ . "/../lib/autoload.inc";
+include_once __DIR__ . "/../vendor/autoload.php";
 
 /**
  * @return \tinyorm\Db
