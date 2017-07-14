@@ -27,6 +27,7 @@ class Select
     private $limit = 0;
     private $offset = 0;
     private $id;
+    private $options = [];
     /**
      * @var DbInterface
      */
@@ -328,6 +329,25 @@ class Select
     }
 
     /**
+     * Add query option (like SQL_NO_CACHE or SQL_CALC_FOUND_ROWS)
+     * @param string $option
+     */
+    function option(string $option)
+    {
+        $this->options[] = $option;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    function resetOptions()
+    {
+        $this->options = [];
+        return $this;
+    }
+
+    /**
      * @param string $columns
      * @param array ...$bind
      * @return $this
@@ -364,12 +384,13 @@ class Select
     private function compose($cols, $groupBy, $having, $limit, $colsBind, $id)
     {
         $idStr = $id ? "/* $id */" : "";
+        $optionsStr = join(" ", $this->options);
         if ($this->colsBind) {
             $toInflate = [$this->cols => $colsBind];
             list($colsSql, $bind) = $this->inflate($toInflate, [], " ");
-            $sql = "SELECT $idStr {$colsSql} FROM {$this->from}";
+            $sql = "SELECT $optionsStr $idStr {$colsSql} FROM {$this->from}";
         } else {
-            $sql = "SELECT $idStr {$cols} FROM {$this->from}";
+            $sql = "SELECT $optionsStr $idStr {$cols} FROM {$this->from}";
             $bind = [];
         }
 
