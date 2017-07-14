@@ -206,11 +206,12 @@ class Select
     /**
      * @param string $sql
      * @param string $cols
+     * @param array ...$bind
      * @return $this
      */
-    function join($sql, $cols = null)
+    function join($sql, $cols = null, ...$bind)
     {
-        $this->joins[$sql] = array_slice(func_get_args(), 2);
+        $this->joins[$sql] = $bind;
         if ($cols) {
             $this->cols .= ", {$cols}";
         }
@@ -218,42 +219,91 @@ class Select
     }
 
     /**
-     * @param $sql
      * @return $this
      */
-    function where($sql)
+    function resetJoins()
     {
-        $this->where[$sql] = array_slice(func_get_args(), 1);
+        $this->joins = [];
         return $this;
     }
 
     /**
      * @param $sql
+     * @param array ...$bind
      * @return $this
      */
-    function groupBy($sql)
+    function where($sql, ...$bind)
     {
-        $this->groupBy[$sql] = array_slice(func_get_args(), 1);
+        $this->where[$sql] = $bind;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    function resetWhere()
+    {
+        $this->where = [];
         return $this;
     }
 
     /**
      * @param $sql
+     * @param array ...$bind
      * @return $this
      */
-    function having($sql)
+    function groupBy($sql, ...$bind)
     {
-        $this->having[$sql] = array_slice(func_get_args(), 1);
+        $this->groupBy[$sql] = $bind;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    function resetGroupBy()
+    {
+        $this->groupBy = [];
         return $this;
     }
 
     /**
      * @param $sql
+     * @param array ...$bind
      * @return $this
      */
-    function orderBy($sql)
+    function having($sql, ...$bind)
     {
-        $this->orderBy[$sql] = array_slice(func_get_args(), 1);
+        $this->having[$sql] = $bind;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    function resetHaving()
+    {
+        $this->having = [];
+        return $this;
+    }
+
+    /**
+     * @param $sql
+     * @param array ...$bind
+     * @return $this
+     */
+    function orderBy($sql, ...$bind)
+    {
+        $this->orderBy[$sql] = $bind;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    function resetOrderBy()
+    {
+        $this->orderBy = [];
         return $this;
     }
 
