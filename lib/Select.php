@@ -18,7 +18,7 @@ class Select
     static protected $defaultConnection;
     private $from;
     private $cols;
-    private $colsBind;
+    private $colsBind = [];
     private $joins = [];
     private $where = [];
     private $groupBy = [];
@@ -51,12 +51,12 @@ class Select
      * Select constructor.
      * @param string $from
      * @param string $cols
+     * @param mixed $bind1,.. $bindXXX - parameters to bind to placeholders in columns SQL expression
      */
-    function __construct($from, $cols = "*")
+    function __construct($from, $cols = "*", ...$bind)
     {
         $this->from = $from;
-        $this->cols = $cols;
-        $this->colsBind = array_slice(func_get_args(), 2);
+        $this->replaceColumns($cols, ...$bind);
     }
 
     /**
@@ -275,6 +275,26 @@ class Select
     {
         $this->offset = $n;
         return $this;
+    }
+
+    /**
+     * @param string $columns
+     * @param array ...$bind
+     */
+    function appendColumns(string $columns, ...$bind)
+    {
+        $this->cols = join(", ", [$this->cols, $columns]);
+        $this->colsBind = array_merge($this->colsBind, $bind);
+    }
+
+    /**
+     * @param string $columns
+     * @param array ...$bind
+     */
+    function replaceColumns(string $columns, ...$bind)
+    {
+        $this->cols = $columns;
+        $this->colsBind = $bind;
     }
 
     /**
