@@ -330,21 +330,25 @@ class Select
     /**
      * @param string $columns
      * @param array ...$bind
+     * @return $this
      */
     function appendColumns(string $columns, ...$bind)
     {
         $this->cols = join(", ", [$this->cols, $columns]);
         $this->colsBind = array_merge($this->colsBind, $bind);
+        return $this;
     }
 
     /**
      * @param string $columns
      * @param array ...$bind
+     * @return $this
      */
     function replaceColumns(string $columns, ...$bind)
     {
         $this->cols = $columns;
         $this->colsBind = $bind;
+        return $this;
     }
 
     /**
