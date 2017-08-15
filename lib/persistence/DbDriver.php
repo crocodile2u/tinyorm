@@ -119,6 +119,7 @@ class DbDriver implements Driver
         }
 
         $toUpdate = array_diff_key($entity->toArray(), $entity->getAutoUpdatedCols(true));
+        unset($toUpdate[$entity->getPKName()]);
         $set = [];
         foreach (array_keys($toUpdate) as $column) {
             $set[] = "$column = :$column";
@@ -127,9 +128,9 @@ class DbDriver implements Driver
         $sql = "UPDATE {$entity->getSourceName()} SET " . join(", ", $set) .
             " WHERE {$entity->getPKName()} = :{$entity->getPKName()}";
         $stmt = $this->db->prepare($sql);
-        $result = $stmt->execute($toUpdate);
+        $result = $stmt->execute($toUpdate + [$entity->getPKName() => $entity->getPK()]);
         if (!$result) {
-            throw new \RuntimeException("UDPATE entity: DB query failed (PK: {$entity->getPK()})");
+            throw new \RuntimeException("UPDATE entity: DB query failed (PK: {$entity->getPK()})");
         }
         $affectedRowCount = $stmt->rowCount();
         return $entity;
