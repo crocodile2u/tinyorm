@@ -5,6 +5,9 @@
     "ext-pdo": "*"
   },
   "license": "MIT",
+  "bin": {
+    "tinyorm": "bin/tinyorm"
+  },
   "autoload": {
     "psr-4": {
       "tinyorm\\": "lib/"
