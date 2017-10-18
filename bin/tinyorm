@@ -56,7 +56,7 @@ $updatedSettings = array_intersect_key(
     ]
 );
 
-$autoloads = [__DIR__ . "/../autoload.php", __DIR__ . "/../vendor/autoload.php"];
+$autoloads = [__DIR__ . "/../../../autoload.php", __DIR__ . "/../vendor/autoload.php"];
 $autoloadFound = false;
 foreach ($autoloads as $autoload) {
     if (is_file($autoload)) {
