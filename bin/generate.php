@@ -1,5 +1,7 @@
+#!/usr/bin/env php
 <?php
-
+error_reporting(E_ALL);
+ini_set("display_errors", "On");
 $opts = getopt("", [
     "host:",
     "port:",
@@ -54,7 +56,20 @@ $updatedSettings = array_intersect_key(
     ]
 );
 
-include_once __DIR__ . "/../vendor/autoload.php";
+$autoloads = [__DIR__ . "/../autoload.php", __DIR__ . "/../vendor/autoload.php"];
+$autoloadFound = false;
+foreach ($autoloads as $autoload) {
+    if (is_file($autoload)) {
+        include_once $autoload;
+        $autoloadFound = true;
+        break;
+    }
+}
+
+if (!$autoloadFound) {
+    echo "autoload.php not found! Searched:\n\t" . join("\n\t", $autoloads) . "\n";
+    exit(1);
+}
 
 $generator = new \tinyorm\scaffold\EntityGenerator();
 $phpCode = $generator->setHost(@$opts["host"])
