@@ -54,6 +54,14 @@ abstract class Entity implements \JsonSerializable
     }
 
     /**
+     * @return Select
+     */
+    static public function select($cols = "*")
+    {
+        return new Select(static::getSourceName(), $cols);
+    }
+
+    /**
      * @param $id
      * @param Driver|null $driver
      * @return Entity
