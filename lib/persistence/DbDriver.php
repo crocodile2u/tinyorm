@@ -148,6 +148,7 @@ class DbDriver implements Driver
         }
 
         $toInsert = array_diff_key($entity->toArray(), $entity->getAutoUpdatedCols(true));
+        unset($toInsert[$entity->getPKName()]);
         $columns = [];
         $placeholders = [];
         foreach (array_keys($toInsert) as $column) {
